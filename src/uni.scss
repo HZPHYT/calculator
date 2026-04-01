@@ -1,0 +1,38 @@
+/* uni.scss - 全局样式变量 */
+
+$uni-color-primary: #2196f3;
+$uni-color-success: #4caf50;
+$uni-color-warning: #ff9800;
+$uni-color-error: #f44336;
+
+$uni-bg-color: #f8f8f8;
+$uni-bg-color-grey: #f8f8f8;
+$uni-bg-color-hover: #f1f1f1;
+$uni-bg-color-mask: rgba(0, 0, 0, 0.4);
+
+$uni-border-color: #e5e5e5;
+
+$uni-text-color: #333;
+$uni-text-color-inverse: #fff;
+$uni-text-color-grey: #999;
+$uni-text-color-placeholder: #808080;
+
+$uni-font-size-sm: 24rpx;
+$uni-font-size-base: 28rpx;
+$uni-font-size-lg: 32rpx;
+
+$uni-spacing-row-sm: 10rpx;
+$uni-spacing-row-base: 20rpx;
+$uni-spacing-row-lg: 30rpx;
+$uni-spacing-col-sm: 8rpx;
+$uni-spacing-col-base: 16rpx;
+$uni-spacing-col-lg: 24rpx;
+
+$uni-border-radius-sm: 4rpx;
+$uni-border-radius-base: 6rpx;
+$uni-border-radius-lg: 12rpx;
+$uni-border-radius-circle: 50%;
+
+$uni-shadow-sm: 0 0 6rpx rgba(0, 0, 0, 0.1);
+$uni-shadow-base: 0 1rpx 8rpx rgba(0, 0, 0, 0.1);
+$uni-shadow-lg: 0 1rpx 10rpx rgba(0, 0, 0, 0.2);
