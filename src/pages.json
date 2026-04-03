@@ -17,9 +17,9 @@
       }
     },
     {
-      "path": "pages/scientific/scientific",
+      "path": "pages/unit/unit",
       "style": {
-        "navigationBarTitleText": "科学计算器",
+        "navigationBarTitleText": "单位换算器",
         "navigationBarBackgroundColor": "#2196f3",
         "navigationBarTextStyle": "white"
       }

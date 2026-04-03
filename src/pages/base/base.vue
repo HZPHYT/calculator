@@ -1,5 +1,9 @@
 <template>
   <view class="container">
+    <view class="header-row">
+      <view class="history-btn" @click="toggleHistory">历史</view>
+    </view>
+
     <view class="input-group">
       <view class="label">输入数值</view>
       <input class="input" type="text" v-model="inputValue" placeholder="请输入数值" />
@@ -24,8 +28,23 @@
     <view class="result-container">
       <view class="result-item">
         <view class="result-label">转换结果：</view>
-        <view class="result-value">{{ result }}</view>
+        <view class="result-value" @click="copyResult">{{ result }}</view>
       </view>
+    </view>
+    <view class="copy-tip">点击结果可复制</view>
+
+    <view class="history-panel" v-if="showHistory">
+      <view class="history-header">
+        <text>历史记录</text>
+        <text class="clear-btn" @click="clearHistory">清空</text>
+      </view>
+      <scroll-view class="history-list" scroll-y>
+        <view class="history-item" v-for="(item, index) in history" :key="index" @click="restoreHistory(item)">
+          <view class="history-data">{{ item.inputValue }} ({{ item.fromBase }} → {{ item.toBase }})</view>
+          <view class="history-result">{{ item.result }}</view>
+        </view>
+        <view class="history-empty" v-if="history.length === 0">暂无历史记录</view>
+      </scroll-view>
     </view>
   </view>
 </template>
@@ -38,6 +57,8 @@ export default {
       fromBaseIndex: 2,
       toBaseIndex: 0,
       result: '',
+      showHistory: false,
+      history: [],
       baseOptions: [
         { name: '二进制', value: 2 },
         { name: '八进制', value: 8 },
@@ -46,7 +67,43 @@ export default {
       ]
     }
   },
+  onShow() {
+    this.loadHistory()
+  },
   methods: {
+    vibrate() {},
+    toggleHistory() {
+      this.vibrate()
+      this.showHistory = !this.showHistory
+    },
+    loadHistory() {
+      this.history = uni.getStorageSync('baseHistory') || []
+    },
+    clearHistory() {
+      this.vibrate()
+      uni.removeStorageSync('baseHistory')
+      this.history = []
+    },
+    restoreHistory(item) {
+      this.vibrate()
+      this.inputValue = item.inputValue
+      this.result = item.result
+      for (let i = 0; i < this.baseOptions.length; i++) {
+        if (this.baseOptions[i].name === item.fromBase) this.fromBaseIndex = i
+        if (this.baseOptions[i].name === item.toBase) this.toBaseIndex = i
+      }
+      this.showHistory = false
+    },
+    copyResult() {
+      if (this.result && this.result !== '输入格式错误') {
+        uni.setClipboardData({
+          data: this.result,
+          success: () => {
+            uni.showToast({ title: '已复制', icon: 'success' })
+          }
+        })
+      }
+    },
     onFromBaseChange(e) {
       this.fromBaseIndex = e.detail.value
     },
@@ -55,12 +112,10 @@ export default {
     },
     convert() {
       if (!this.inputValue) {
-        uni.showToast({
-          title: '请输入数值',
-          icon: 'none'
-        })
+        uni.showToast({ title: '请输入数值', icon: 'none' })
         return
       }
+      this.vibrate()
       try {
         const fromBase = this.baseOptions[this.fromBaseIndex].value
         const toBase = this.baseOptions[this.toBaseIndex].value
@@ -82,10 +137,11 @@ export default {
         result: this.result,
         timestamp: new Date().toISOString()
       })
-      if (history.length > 10) {
+      if (history.length > 20) {
         history.pop()
       }
       uni.setStorageSync('baseHistory', history)
+      this.history = history
     }
   }
 }
@@ -96,6 +152,20 @@ export default {
   min-height: 100vh;
   background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
   padding: 40rpx;
+}
+
+.header-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20rpx;
+}
+
+.history-btn {
+  font-size: 28rpx;
+  color: #607d8b;
+  padding: 10rpx 24rpx;
+  background: rgba(96, 125, 139, 0.1);
+  border-radius: 20rpx;
 }
 
 .input-group {
@@ -167,7 +237,72 @@ export default {
 .result-value {
   font-size: 48rpx;
   font-weight: bold;
-  color: #2196f3;
+  color: #607d8b;
   word-break: break-all;
+}
+
+.copy-tip {
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 10rpx;
+}
+
+.history-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 70%;
+  height: 100vh;
+  background: white;
+  box-shadow: -4rpx 0 24rpx rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-header {
+  padding: 40rpx;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.clear-btn {
+  color: #f44336;
+  font-size: 28rpx;
+}
+
+.history-list {
+  flex: 1;
+  padding: 20rpx;
+}
+
+.history-item {
+  padding: 30rpx;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.history-data {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.history-result {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #607d8b;
+}
+
+.history-empty {
+  text-align: center;
+  color: #999;
+  padding: 60rpx;
+  font-size: 28rpx;
 }
 </style>
